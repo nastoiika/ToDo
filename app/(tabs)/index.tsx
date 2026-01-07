@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, FlatList, Button, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 
 import { loadTasks, saveTasks, migrateIfNeeded, type Task } from '@/utils/storage';
@@ -29,6 +30,21 @@ export default function Index() {
       }
     })();
   }, []);
+
+  const loadData = async () => {
+    try {
+      const stored = await loadTasks();
+      setTasks(stored);
+    } catch {
+      // ignore load errors on focus
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   /* ---------- SAVE TASKS ---------- */
   useEffect(() => {
